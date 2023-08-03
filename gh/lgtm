@@ -1,0 +1,6 @@
+#!/bin/sh
+
+gh pr review $1 --approve
+echo "gh pr review $1 --approve"
+gh pr review $1 --comment -b "LGTM"
+echo "gh pr review $1 --comment -b \"LGTM\""

@@ -1,0 +1,53 @@
+# brew bundle
+
+# taps
+# tap "adoptopenjdk/openjdk"
+tap "homebrew/bundle"
+tap "homebrew/cask"
+tap "homebrew/core"
+tap "homebrew/cask-fonts"
+tap "lokalise/cli-2"
+
+# appdir
+cask_args appdir: "/Applications"
+
+# brew packages
+brew "gh" # github cli
+brew "mas"
+brew "tree"
+brew "wget"
+brew "zsh-autosuggestions"
+brew "zsh-syntax-highlighting"
+brew "lokalise2"
+# 선택사항
+# brew "bundletool"
+# brew "cmake"
+# brew "scrcpy" # 안드로이드 디바이스 미러링
+# brew "lefthook" # git hook 편리하게 사용할 수 있는 패키지
+
+# cask packages
+cask "alfred"
+cask "iterm2"
+cask "shiftit"
+cask "visual-studio-code"
+# cask "docker"
+# cask "google-chrome"
+# cask "adoptopenjdk8"
+# cask "android-studio"
+# cask "gureumkim"
+
+# cask fonts
+cask "font-hack"
+# cask "font-nanumgothic"
+
+# appstore apps
+mas "Xcode", id:497799835
+# mas "Keynote", id:409183694
+# mas "Microsoft Excel", id:462058435
+# mas "Microsoft OneNote", id:784801555
+# mas "Microsoft Outlook", id:985367838
+# mas "Microsoft PowerPoint", id:462062816
+# mas "Microsoft To Do", id:1274495053
+# mas "Numbers", id:409203825
+# mas "Pages", id:409201541
+# mas "Teams", id:1543576480

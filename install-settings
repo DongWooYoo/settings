@@ -1,0 +1,99 @@
+#!/bin/bash
+
+settings_path=$(dirname $0)
+
+diff_file=/tmp/install.diff
+diff_cp() {
+	if [ -z "$1" -o -z "$2" ]; then
+		return 0
+	fi
+
+	if [ ! -e $2 ]; then
+		$3 cp $1 $2
+	fi
+
+	diff -u $2 $1 > $diff_file
+	local diff_return=$?
+	if [ $diff_return -eq 0 ]; then
+		return 1
+	fi
+
+	while [ 1 ]; do
+		echo cp: overwrite "'$2' [Y/n/d(diff)]? "
+		read choice
+		if [ "$choice" = "Y" -o "$choice" = "y" ]; then
+			$3 cp $1 $2
+			return 2
+		elif [ "$choice" = "N" -o "$choice" = "n" ]; then
+			return 3
+		elif [ "$choice" = "d" ]; then
+			less -X $diff_file
+		fi
+	done
+}
+
+fge() {
+	awk -v n1=$1 -v n2=$2 'BEGIN{ if (n1 >= n2) exit 0; exit 1 }'
+}
+
+echo_begin() {
+	echo "--- $1 settings ---"
+}
+
+echo_end() {
+	echo "$1 settings... OK"
+}
+
+echo_begin git
+git_user_name="`git config --global --get user.name`"
+git_user_email="`git config --global --get user.email`"
+
+diff_cp $settings_path/git/.gitconfig ~/.gitconfig
+
+git_version=`git --version | cut -d ' ' -f 3`
+if fge $git_version 1.7.11; then
+	git config --global push.default simple
+else
+	git config --global push.default current
+fi
+
+if [ "$git_user_name" = "" ]; then
+		echo -n "user.name: "
+		read git_user_name
+fi
+
+if [ "$git_user_email" = "" ]; then
+		echo -n "user.email: "
+		read git_user_email
+fi
+
+git config --global user.name "$git_user_name"
+git config --global user.email "$git_user_email"
+echo_end   git
+
+echo_begin gh
+diff_cp $settings_path/gh/config.yml ~/.config/gh/config.yml
+echo_end   gh
+
+install_brew_package() {
+	while [ 1 ]; do
+		echo brew bundle install? "[Y/n]? "
+		read choice
+		if [ "$choice" = "Y" -o "$choice" = "y" ]; then
+			brew bundle --file ./brew/BrewFile
+			return 2
+		else
+			return 3
+		fi
+	done
+}
+
+if [ "`uname`" = "Darwin" ]; then
+	if [ "`which brew 2> /dev/null`" = "" ]; then
+		/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+	fi
+	sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+	mv $HOME/.zshrc $HOME/.zshrc_backup
+	cp zsh/zshrc $HOME/.zshrc
+	install_brew_package
+fi
